@@ -1,0 +1,76 @@
+---
+title: "The Relationship Between Transmission and  Mile Per Gallon (MPG)"
+author: "Cynthia Tang"
+date: "June 9, 2019"
+output:
+  md_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Summary  
+The report explored the relationship between transmission types and miles per gallon (MPG). Figure 1 in appendix showed that an automatic transmission trend to be better for MPG. Then, we performed t-test to verify the hypothesis and draw a conclusion. To quantify the MPG difference between automatic and manual transmissins, we fit the MPG (outcome) and transmission (regressor) in to the linar model.
+
+## Results
+```{r }
+mtcars1 <- mtcars
+mtcars1$am <- ifelse(mtcars$am == 1, "automatic", "manual")
+# fitting lm
+trs <- lm(mpg ~ factor(am), data =mtcars1)
+t.am <- t.test(mpg ~ factor(am), data = mtcars1, alternative = "greater", var.equal = TRUE)
+```
+
+The mean mpg of automatic transmission is `r t.am$estimate[1]` miles per gallon, the mean of manual transmission is `r t.am$estimate[2]` miles per gallon. An automatic transmission is better for MPG. MPG can fiited into linear regression with the regressor of transmission.  
+  
+__Model Selection__  
+  
+We set __mpg__ as the outcome and __transmission(am)__ as the repressor. We selected linear regression model, $Y_i = \beta_0 + \beta_1 X_1 + \epsilon_i$, $X_1$ is either 0 for automatic or 1 for manual.   
+  
+__Interpretion__   
+  
+The intercept $\beta_0$ is `r trs$coefficients[1]`, which is interpret as the expected mpg of automatic transmission and is euqal to the mean mpg of automatic transmission.  
+The slope $\beta_1$ is `r trs$coefficients[2]`, which is interpreted as the expected change of the mean mpg comparing those in manual to those in automatic transmission. $\beta_0 + \beta_1$ is equal to the mean mpg of manual transmission.   
+  
+__T-test__  
+  
+We did student t-test with the $H_0$: The difference in means in automatic and manual transmission is equal, and the $H_0$ : The mean in automatic is greater than that in manual transmission. The p-value is `r t.am$p.value`. If we assumed the type I error $\alpha$ = 0.05, then we rejected $H_0$ and concluded that an automatic transmission is better for MPG.  
+  
+__Diagnostics__  
+  
+```{r diagnostic}
+par(mfrow = c(2, 2))
+plot(trs)
+mean(trs$residuals)
+```
+The mean of residuals is `r mean(trs$residuals)`, approximating to zero.   
+The patten in plot "Residual vs Fitted" is approximately flat, indicating the homoscedasticity of residuals or equal variance.   
+  
+__The uncertainty__   
+  
+We assumed other variables not included in the linear model were completely randomized. The error $\epsilon$ in the linear model followed normal distribution.
+
+
+## Appendix
+  
+```{r plots}
+str(mtcars)
+library(ggplot2)
+mtcars1 <- mtcars
+mtcars1$am <- ifelse(mtcars$am == 1, "automatic", "manual")
+# plotting
+ggplot(mtcars1, aes(am, mpg, fill = am)) +
+        geom_boxplot() +
+        xlab("Transmission") +
+        ylab("mpg (miles/(US) gallon") +
+        ggtitle("Figure 1. Relationship Between MPG and Transmission")
+# fitting lm
+trs <- lm(mpg ~ factor(am), data =mtcars1)
+summary(trs)
+# t-test
+t.test(mpg ~ factor(am), data = mtcars1, alternative = "greater")
+```
+
