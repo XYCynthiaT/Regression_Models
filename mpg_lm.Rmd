@@ -1,11 +1,11 @@
 ---
-title: "The Relationship Between Transmission and  Mile Per Gallon (MPG)"
+title: "Transmission and  Mile Per Gallon (MPG)"
 author: "Cynthia Tang"
 date: "June 9, 2019"
 output:
   md_document: default
-  html_document: default
   word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -13,64 +13,148 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Summary  
-The report explored the relationship between transmission types and miles per gallon (MPG). Figure 1 in appendix showed that an automatic transmission trend to be better for MPG. Then, we performed t-test to verify the hypothesis and draw a conclusion. To quantify the MPG difference between automatic and manual transmissins, we fit the MPG (outcome) and transmission (regressor) in to the linar model.
+The report explored the relationship between transmission types and miles per gallon (MPG). Figure 1 in appendix showed that an automatic transmission trend to be better for MPG, considering other factors. Then, we performed t-test to verify the hypothesis. To quantify the MPG difference between automatic and manual transmissins, we fitted the MPG (outcome) and a set of variables (regressors) in to multiple linar models. We selected tansmission (am), number of cylinders (cyl), gross horsepower (hp), and weight (wt) as repressors and fitted the linear model: $MPG_i = \beta_0 + \beta_1 am(maual) + \beta_2 cyl(6) + \beta_3 cyl(8) + \beta_4 hp_i + \beta_5 wt_i + \epsilon_i$.  
 
 ## Results
-```{r }
+```{r, include=FALSE}
 mtcars1 <- mtcars
 mtcars1$am <- ifelse(mtcars$am == 1, "automatic", "manual")
+
+# t.test
+t.am <- t.test(mpg ~ factor(am), data = mtcars1, alternative = "greater")
 # fitting lm
-trs <- lm(mpg ~ factor(am), data =mtcars1)
-t.am <- t.test(mpg ~ factor(am), data = mtcars1, alternative = "greater", var.equal = TRUE)
+library(car)
+fit1 <- lm(mpg ~ factor(am), data =mtcars1)
+fit2 <- lm(mpg ~ factor(am) + factor(cyl), data =mtcars1)
+anova(fit1, fit2)
+vif(fit2)
+fit3 <- lm(mpg ~ factor(am) + factor(cyl) + disp, data =mtcars1)
+vif(fit3)
+anova(fit1, fit2, fit3) # it unnessary to include disp as a regressor
+fit4 <- lm(mpg ~ factor(am) + factor(cyl) + hp, data =mtcars1)
+vif(fit4)
+anova(fit1, fit2, fit4) # hp increased variance
+fit5 <- lm(mpg ~ factor(am) + factor(cyl) + hp + drat, data =mtcars1)
+vif(fit5)
+anova(fit1, fit2, fit4, fit5) # unnessary
+fit6 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt, data =mtcars1) # selected!
+vif(fit6)
+anova(fit1, fit2, fit4, fit6) # wt increased variance
+fit7 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + qsec, data =mtcars1)
+vif(fit7)
+anova(fit1, fit2, fit4, fit6, fit7) # unnecessary
+fit8 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + factor(vs), data =mtcars1)
+vif(fit8)
+anova(fit1, fit2, fit4, fit6, fit8) # unnecessary
+fit9 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + factor(gear), data =mtcars1)
+vif(fit9)
+anova(fit1, fit2, fit4, fit6, fit9) # unnecessary
+fit10 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + factor(carb), data =mtcars1)
+vif(fit10)
+anova(fit1, fit2, fit4, fit6, fit10) # unnecessary
+summary(fit6)
 ```
 
-The mean mpg of automatic transmission is `r t.am$estimate[1]` miles per gallon, the mean of manual transmission is `r t.am$estimate[2]` miles per gallon. An automatic transmission is better for MPG. MPG can fiited into linear regression with the regressor of transmission.  
+The mean of automatic transmission: `r t.am$estimate[1]` miles per gallon.  
+The mean of manual transmission: `r t.am$estimate[2]` miles per gallon.   
   
 __Model Selection__  
-  
-We set __mpg__ as the outcome and __transmission(am)__ as the repressor. We selected linear regression model, $Y_i = \beta_0 + \beta_1 X_1 + \epsilon_i$, $X_1$ is either 0 for automatic or 1 for manual.   
-  
+The detailed process of model selection is shown in __Appendix__.  
+We set __mpg__ as the outcome and __transmission (am)__, __number of cylinders (cyl)__, __gross horsepower (hp)__, and __weight (wt)__ as repressors and fitted the linear model: $MPG_i = \beta_0 + \beta_1 am(maual) + \beta_2 cyl(6) + \beta_3 cyl(8) + \beta_4 hp_i + \beta_5 wt_i + \epsilon_i$. We assume $\epsilon_i$ ~ $N(\mu, \sigma^2)$.     
+The coefficients of the linear model are showed below:
+```{r}
+coefficients(fit6)
+```
+
 __Interpretion__   
-  
-The intercept $\beta_0$ is `r trs$coefficients[1]`, which is interpret as the expected mpg of automatic transmission and is euqal to the mean mpg of automatic transmission.  
-The slope $\beta_1$ is `r trs$coefficients[2]`, which is interpreted as the expected change of the mean mpg comparing those in manual to those in automatic transmission. $\beta_0 + \beta_1$ is equal to the mean mpg of manual transmission.   
+The intercept $\beta_0$ is interpret as the expected mpg of automatic transmission when there is 4 cylinders, 0 gross horsepower, and none weight.  
+The $\beta_1$ is interpreted as the expected change in mpg comparing those in manual to those in automatic transmission.  
+The $\beta_2$ is interpreted as the expected change in mpg comparing those with 6 cylinders to those with 4 cylinders.  
+The $\beta_3$ is interpreted as the expected change in mpg comparing those with 8 cylinders to those with 4 cylinders.  
+The $\beta_4$ is interpreted as the expected change in mpg for every 1 gross horsepower increase.  
+The $\beta_5$ is interpreted as the expected change in mpg fot every 1000 lbs increase in the weight of cars.  
   
 __T-test__  
+Assumption: Unequal variance. Detailed test results is shown in __Appendix__.   $H_0$: $\mu_{auto} = \mu_{manual}$.  
+$H_a$: $\mu_{auto} > \mu_{manual}$.  
+The p-value: `r t.am$p.value`. The type I error $\alpha$ = 0.05, then we rejected $H_0$ and concluded that an automatic transmission is better for MPG.  
   
-We did student t-test with the $H_0$: The difference in means in automatic and manual transmission is equal, and the $H_0$ : The mean in automatic is greater than that in manual transmission. The p-value is `r t.am$p.value`. If we assumed the type I error $\alpha$ = 0.05, then we rejected $H_0$ and concluded that an automatic transmission is better for MPG.  
+__Quantify the MPG Difference__  
+$\mu_{auto} - \mu_{manual}$ = `r t.am$estimate[1] - t.am$estimate[2]`.  
+Adjustment: $MPG_{auto} - MPG_{manual}$ = abs($\beta_1$) = `r abs(coefficients(fit6)[2])`. 
   
 __Diagnostics__  
-  
-```{r diagnostic}
+```{r diagnostic, fig.width=4, fig.height=4}
 par(mfrow = c(2, 2))
-plot(trs)
-mean(trs$residuals)
+plot(fit6)
 ```
-The mean of residuals is `r mean(trs$residuals)`, approximating to zero.   
-The patten in plot "Residual vs Fitted" is approximately flat, indicating the homoscedasticity of residuals or equal variance.   
+  
+The mean of residuals is `r mean(fit6$residuals)`, approximating to zero.   
+"Residual vs Fitted" is approximately flat, indicating the homoscedasticity of residuals. The Q-Q plot showed that all residuals were approximately stardard normal distributed.  
   
 __The uncertainty__   
-  
 We assumed other variables not included in the linear model were completely randomized. The error $\epsilon$ in the linear model followed normal distribution.
+However, we are uncertain whether there is a better linear model with other combination of diferent regressors.   
 
-
-## Appendix
-  
-```{r plots}
-str(mtcars)
+## Appendix  
+### Figure  
+```{r plots, message=FALSE, warning=FALSE}
 library(ggplot2)
-mtcars1 <- mtcars
-mtcars1$am <- ifelse(mtcars$am == 1, "automatic", "manual")
+library(gridExtra)
 # plotting
-ggplot(mtcars1, aes(am, mpg, fill = am)) +
+p1 <- ggplot(mtcars1, aes(am, mpg, fill = am)) +
         geom_boxplot() +
         xlab("Transmission") +
         ylab("mpg (miles/(US) gallon") +
-        ggtitle("Figure 1. Relationship Between MPG and Transmission")
+        ggtitle("MPG vs Transmission")
+p2 <- ggplot(mtcars1, aes(wt, mpg, color = am)) +
+        geom_point() +
+        xlab("Weight (1000lbs)") +
+        ylab("mpg (miles/(US) gallon") +
+        ggtitle("MPG vs Transmission and Weight")
+p3 <- ggplot(mtcars1, aes(hp, mpg, color = am)) +
+        geom_point() +
+        xlab("Gross horsepower") +
+        ylab("mpg (miles/(US) gallon") +
+        ggtitle("MPG vs Transmission and \n Gross horsepower")
+p4 <- ggplot(mtcars1, aes(factor(cyl), mpg)) +
+        geom_point(aes(color = am)) +
+        geom_boxplot(aes(fill = am), alpha = 1/5) +
+        xlab("Number of Cylinders") +
+        ylab("mpg (miles/(US) gallon") +
+        ggtitle("MPG vs Transmission and \n the Number of Cylinders")
+grid.arrange(p1, p2, p3, p4, bottom = "Figure 1. The relationship between MPG and a set of variables", nrow = 2)
+```
+  
+### Model Selection  
+```{r modelselection}
 # fitting lm
-trs <- lm(mpg ~ factor(am), data =mtcars1)
-summary(trs)
-# t-test
+library(car)
+fit1 <- lm(mpg ~ factor(am), data =mtcars1)
+fit2 <- lm(mpg ~ factor(am) + factor(cyl), data =mtcars1)
+anova(fit1, fit2)
+fit3 <- lm(mpg ~ factor(am) + factor(cyl) + disp, data =mtcars1)
+anova(fit1, fit2, fit3) # it unnessary to include disp as a regressor
+fit4 <- lm(mpg ~ factor(am) + factor(cyl) + hp, data =mtcars1)
+anova(fit1, fit2, fit4) # hp increased variance
+fit5 <- lm(mpg ~ factor(am) + factor(cyl) + hp + drat, data =mtcars1)
+anova(fit1, fit2, fit4, fit5) # unnessary
+fit6 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt, data =mtcars1) # selected!
+anova(fit1, fit2, fit4, fit6) # wt increased variance
+fit7 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + qsec, data =mtcars1)
+anova(fit1, fit2, fit4, fit6, fit7) # unnecessary
+fit8 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + factor(vs), data =mtcars1)
+anova(fit1, fit2, fit4, fit6, fit8) # unnecessary
+fit9 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + factor(gear), data =mtcars1)
+anova(fit1, fit2, fit4, fit6, fit9) # unnecessary
+fit10 <- lm(mpg ~ factor(am) + factor(cyl) + hp + wt + factor(carb), data =mtcars1)
+anova(fit1, fit2, fit4, fit6, fit10) # unnecessary
+```
+
+### T-test Results  
+```{r ttest}
+# t.test
 t.test(mpg ~ factor(am), data = mtcars1, alternative = "greater")
+
 ```
 
