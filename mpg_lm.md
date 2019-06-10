@@ -2,75 +2,76 @@ Summary
 -------
 
 The report explored the relationship between transmission types and
-miles per gallon (MPG). Figure 1 in appendix showed that an automatic
+miles per gallon (MPG). Figure 1 in appendix showed that an manual
 transmission trend to be better for MPG, considering other factors.
 Then, we performed t-test to verify the hypothesis. To quantify the MPG
 difference between automatic and manual transmissins, we fitted the MPG
 (outcome) and a set of variables (regressors) in to multiple linar
 models. We selected tansmission (am), number of cylinders (cyl), gross
-horsepower (hp), and weight (wt) as repressors and fitted the linear
-model:
-*M**P**G*<sub>*i*</sub> = *β*<sub>0</sub> + *β*<sub>1</sub>*a**m*(*m**a**u**a**l*)+*β*<sub>2</sub>*c**y**l*(6)+*β*<sub>3</sub>*c**y**l*(8)+*β*<sub>4</sub>*h**p*<sub>*i*</sub> + *β*<sub>5</sub>*w**t*<sub>*i*</sub> + *ϵ*<sub>*i*</sub>.
+horsepower (hp), and weight (wt) as repressors.
 
 Results
 -------
 
-The mean of automatic transmission: 24.3923077 miles per gallon.  
-The mean of manual transmission: 17.1473684 miles per gallon.
+The mean of automatic transmission: 17.1473684 miles per gallon.  
+The mean of manual transmission: 24.3923077 miles per gallon.
 
 **Model Selection**  
-The detailed process of model selection is shown in **Appendix**.  
-We set **mpg** as the outcome and **transmission (am)**, **number of
-cylinders (cyl)**, **gross horsepower (hp)**, and **weight (wt)** as
-repressors and fitted the linear model:
-*M**P**G*<sub>*i*</sub> = *β*<sub>0</sub> + *β*<sub>1</sub>*a**m*(*m**a**u**a**l*)+*β*<sub>2</sub>*c**y**l*(6)+*β*<sub>3</sub>*c**y**l*(8)+*β*<sub>4</sub>*h**p*<sub>*i*</sub> + *β*<sub>5</sub>*w**t*<sub>*i*</sub> + *ϵ*<sub>*i*</sub>.
-We assume *ϵ*<sub>*i*</sub> ~ *N*(*μ*, *σ*<sup>2</sup>).  
+We used nested model search. The detailed process of model selection is
+shown in **Appendix**.  
+We set mpg as the outcome and transmission (am), number of cylinders
+(cyl), gross horsepower (hp), and weight (wt) as repressors and fitted
+the linear model:
+*M**P**G*<sub>*i*</sub> = *β*<sub>0</sub> + *β*<sub>1</sub>*a**m*(*m**a**n**u**a**l*)+*β*<sub>2</sub>*c**y**l*(6)+*β*<sub>3</sub>*c**y**l*(8)+*β*<sub>4</sub>*h**p*<sub>*i*</sub> + *β*<sub>5</sub>*w**t*<sub>*i*</sub> + *ϵ*<sub>*i*</sub>.
+Assume *ϵ*<sub>*i*</sub> ~ *N*(*μ*, *σ*<sup>2</sup>).  
 The coefficients of the linear model are showed below:
 
     ##      (Intercept) factor(am)manual     factor(cyl)6     factor(cyl)8 
-    ##      35.51753528      -1.80921138      -3.03134449      -2.16367532 
+    ##      33.70832390       1.80921138      -3.03134449      -2.16367532 
     ##               hp               wt 
     ##      -0.03210943      -2.49682942
 
 **Interpretion**  
-The intercept *β*<sub>0</sub> is interpret as the expected mpg of
-automatic transmission when there is 4 cylinders, 0 gross horsepower,
-and none weight.  
-The *β*<sub>1</sub> is interpreted as the expected change in mpg
-comparing those in manual to those in automatic transmission.  
-The *β*<sub>2</sub> is interpreted as the expected change in mpg
-comparing those with 6 cylinders to those with 4 cylinders.  
-The *β*<sub>3</sub> is interpreted as the expected change in mpg
-comparing those with 8 cylinders to those with 4 cylinders.  
-The *β*<sub>4</sub> is interpreted as the expected change in mpg for
-every 1 gross horsepower increase.  
-The *β*<sub>5</sub> is interpreted as the expected change in mpg fot
-every 1000 lbs increase in the weight of cars.
+The intercept *β*<sub>0</sub>: the expected mpg of automatic
+transmission when there is 4 cylinders, 0 gross horsepower, and none
+weight.  
+The *β*<sub>1</sub>: the expected change in mpg comparing those in
+manual to those in automatic transmission.  
+The *β*<sub>2</sub>: the expected change in mpg comparing those with 6
+cylinders to those with 4 cylinders.  
+The *β*<sub>3</sub>: the expected change in mpg comparing those with 8
+cylinders to those with 4 cylinders.  
+The *β*<sub>4</sub>: the expected change in mpg for every 1 gross
+horsepower increase.  
+The *β*<sub>5</sub>: the expected change in mpg fot every 1000 lbs
+increase in the weight of cars.
 
 **T-test**  
 Assumption: Unequal variance. Detailed test results is shown in
-**Appendix**. *H*<sub>0</sub>:
+**Appendix**.  
+*H*<sub>0</sub>:
 *μ*<sub>*a**u**t**o*</sub> = *μ*<sub>*m**a**n**u**a**l*</sub>.  
 *H*<sub>*a*</sub>:
-*μ*<sub>*a**u**t**o*</sub> &gt; *μ*<sub>*m**a**n**u**a**l*</sub>.  
+*μ*<sub>*a**u**t**o*</sub> &lt; *μ*<sub>*m**a**n**u**a**l*</sub>.  
 The p-value: 6.868191710^{-4}. The type I error *α* = 0.05, then we
-rejected *H*<sub>0</sub> and concluded that an automatic transmission is
+rejected *H*<sub>0</sub> and concluded that a manual transmission is
 better for MPG.
 
 **Quantify the MPG Difference**  
-*μ*<sub>*a**u**t**o*</sub> − *μ*<sub>*m**a**n**u**a**l*</sub> =
+*μ*<sub>*m**a**n**u**a**l*</sub> − *μ*<sub>*a**u**t**o*</sub> =
 7.2449393.  
 Adjustment:
-*M**P**G*<sub>*a**u**t**o*</sub> − *M**P**G*<sub>*m**a**n**u**a**l*</sub>
+*M**P**G*<sub>*m**a**n**u**a**l*</sub> − *M**P**G*<sub>*a**u**t**o*</sub>
 = abs(*β*<sub>1</sub>) = 1.8092114.
 
 **Diagnostics**  
 ![](mpg_lm_files/figure-markdown_strict/diagnostic-1.png)
 
-The mean of residuals is -5.377642810^{-17}, approximating to zero.  
-"Residual vs Fitted" is approximately flat, indicating the
-homoscedasticity of residuals. The Q-Q plot showed that all residuals
-were approximately stardard normal distributed.
+The mean of residuals is 2.688821410^{-17}, approximating to zero.  
+"Residual vs Fitted": residuals are independent. "scale-location": the
+homoscedasticity of residuals. "Normal Q-Q"": all residuals were
+approximately stardard normal distributed. "Residual vs Leverge": within
+0.5, no outliers.
 
 **The uncertainty**  
 We assumed other variables not included in the linear model were
@@ -219,10 +220,10 @@ Appendix
     ##  Welch Two Sample t-test
     ## 
     ## data:  mpg by factor(am)
-    ## t = 3.7671, df = 18.332, p-value = 0.0006868
-    ## alternative hypothesis: true difference in means is greater than 0
+    ## t = -3.7671, df = 18.332, p-value = 0.0006868
+    ## alternative hypothesis: true difference in means is less than 0
     ## 95 percent confidence interval:
-    ##  3.913256      Inf
+    ##       -Inf -3.913256
     ## sample estimates:
     ## mean in group automatic    mean in group manual 
-    ##                24.39231                17.14737
+    ##                17.14737                24.39231

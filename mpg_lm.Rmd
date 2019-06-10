@@ -13,15 +13,15 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Summary  
-The report explored the relationship between transmission types and miles per gallon (MPG). Figure 1 in appendix showed that an automatic transmission trend to be better for MPG, considering other factors. Then, we performed t-test to verify the hypothesis. To quantify the MPG difference between automatic and manual transmissins, we fitted the MPG (outcome) and a set of variables (regressors) in to multiple linar models. We selected tansmission (am), number of cylinders (cyl), gross horsepower (hp), and weight (wt) as repressors and fitted the linear model: $MPG_i = \beta_0 + \beta_1 am(maual) + \beta_2 cyl(6) + \beta_3 cyl(8) + \beta_4 hp_i + \beta_5 wt_i + \epsilon_i$.  
+The report explored the relationship between transmission types and miles per gallon (MPG). Figure 1 in appendix showed that an manual transmission trend to be better for MPG, considering other factors. Then, we performed t-test to verify the hypothesis. To quantify the MPG difference between automatic and manual transmissins, we fitted the MPG (outcome) and a set of variables (regressors) in to multiple linar models. We selected tansmission (am), number of cylinders (cyl), gross horsepower (hp), and weight (wt) as repressors.  
 
 ## Results
 ```{r, include=FALSE}
 mtcars1 <- mtcars
-mtcars1$am <- ifelse(mtcars$am == 1, "automatic", "manual")
+mtcars1$am <- ifelse(mtcars$am == 0, "automatic", "manual")
 
 # t.test
-t.am <- t.test(mpg ~ factor(am), data = mtcars1, alternative = "greater")
+t.am <- t.test(mpg ~ factor(am), data = mtcars1, alternative = "less")
 # fitting lm
 library(car)
 fit1 <- lm(mpg ~ factor(am), data =mtcars1)
@@ -59,38 +59,39 @@ The mean of automatic transmission: `r t.am$estimate[1]` miles per gallon.
 The mean of manual transmission: `r t.am$estimate[2]` miles per gallon.   
   
 __Model Selection__  
-The detailed process of model selection is shown in __Appendix__.  
-We set __mpg__ as the outcome and __transmission (am)__, __number of cylinders (cyl)__, __gross horsepower (hp)__, and __weight (wt)__ as repressors and fitted the linear model: $MPG_i = \beta_0 + \beta_1 am(maual) + \beta_2 cyl(6) + \beta_3 cyl(8) + \beta_4 hp_i + \beta_5 wt_i + \epsilon_i$. We assume $\epsilon_i$ ~ $N(\mu, \sigma^2)$.     
+We used nested model search. The detailed process of model selection is shown in __Appendix__.  
+We set mpg as the outcome and transmission (am), number of cylinders (cyl), gross horsepower (hp), and weight (wt) as repressors and fitted the linear model: $MPG_i = \beta_0 + \beta_1 am(manual) + \beta_2 cyl(6) + \beta_3 cyl(8) + \beta_4 hp_i + \beta_5 wt_i + \epsilon_i$. Assume $\epsilon_i$ ~ $N(\mu, \sigma^2)$.     
 The coefficients of the linear model are showed below:
 ```{r}
 coefficients(fit6)
 ```
 
 __Interpretion__   
-The intercept $\beta_0$ is interpret as the expected mpg of automatic transmission when there is 4 cylinders, 0 gross horsepower, and none weight.  
-The $\beta_1$ is interpreted as the expected change in mpg comparing those in manual to those in automatic transmission.  
-The $\beta_2$ is interpreted as the expected change in mpg comparing those with 6 cylinders to those with 4 cylinders.  
-The $\beta_3$ is interpreted as the expected change in mpg comparing those with 8 cylinders to those with 4 cylinders.  
-The $\beta_4$ is interpreted as the expected change in mpg for every 1 gross horsepower increase.  
-The $\beta_5$ is interpreted as the expected change in mpg fot every 1000 lbs increase in the weight of cars.  
+The intercept $\beta_0$: the expected mpg of automatic transmission when there is 4 cylinders, 0 gross horsepower, and none weight.  
+The $\beta_1$: the expected change in mpg comparing those in manual to those in automatic transmission.  
+The $\beta_2$: the expected change in mpg comparing those with 6 cylinders to those with 4 cylinders.  
+The $\beta_3$: the expected change in mpg comparing those with 8 cylinders to those with 4 cylinders.  
+The $\beta_4$: the expected change in mpg for every 1 gross horsepower increase.  
+The $\beta_5$: the expected change in mpg fot every 1000 lbs increase in the weight of cars.  
   
 __T-test__  
-Assumption: Unequal variance. Detailed test results is shown in __Appendix__.   $H_0$: $\mu_{auto} = \mu_{manual}$.  
-$H_a$: $\mu_{auto} > \mu_{manual}$.  
-The p-value: `r t.am$p.value`. The type I error $\alpha$ = 0.05, then we rejected $H_0$ and concluded that an automatic transmission is better for MPG.  
+Assumption: Unequal variance. Detailed test results is shown in __Appendix__.     
+$H_0$: $\mu_{auto} = \mu_{manual}$.  
+$H_a$: $\mu_{auto} < \mu_{manual}$.  
+The p-value: `r t.am$p.value`. The type I error $\alpha$ = 0.05, then we rejected $H_0$ and concluded that a manual transmission is better for MPG.  
   
 __Quantify the MPG Difference__  
-$\mu_{auto} - \mu_{manual}$ = `r t.am$estimate[1] - t.am$estimate[2]`.  
-Adjustment: $MPG_{auto} - MPG_{manual}$ = abs($\beta_1$) = `r abs(coefficients(fit6)[2])`. 
+$\mu_{manual} - \mu_{auto}$ = `r t.am$estimate[2] - t.am$estimate[1]`.  
+Adjustment: $MPG_{manual} - MPG_{auto}$ = abs($\beta_1$) = `r abs(coefficients(fit6)[2])`. 
   
 __Diagnostics__  
-```{r diagnostic, fig.width=4, fig.height=4}
+```{r diagnostic, fig.width=5, fig.height=4}
 par(mfrow = c(2, 2))
 plot(fit6)
 ```
   
 The mean of residuals is `r mean(fit6$residuals)`, approximating to zero.   
-"Residual vs Fitted" is approximately flat, indicating the homoscedasticity of residuals. The Q-Q plot showed that all residuals were approximately stardard normal distributed.  
+"Residual vs Fitted": residuals are independent. "scale-location": the homoscedasticity of residuals. "Normal Q-Q"": all residuals were approximately stardard normal distributed. "Residual vs Leverge": within 0.5, no outliers.
   
 __The uncertainty__   
 We assumed other variables not included in the linear model were completely randomized. The error $\epsilon$ in the linear model followed normal distribution.
@@ -98,7 +99,7 @@ However, we are uncertain whether there is a better linear model with other comb
 
 ## Appendix  
 ### Figure  
-```{r plots, message=FALSE, warning=FALSE}
+```{r plots, message=FALSE, warning=FALSE, fig.width=7, fig.height=5}
 library(ggplot2)
 library(gridExtra)
 # plotting
@@ -154,7 +155,15 @@ anova(fit1, fit2, fit4, fit6, fit10) # unnecessary
 ### T-test Results  
 ```{r ttest}
 # t.test
-t.test(mpg ~ factor(am), data = mtcars1, alternative = "greater")
+t.test(mpg ~ factor(am), data = mtcars1, alternative = "less")
 
+```
+
+```{r peers, include=FALSE}
+fullModelFit <- lm(mpg ~ ., data = mtcars)
+stepFit <- step(fullModelFit)
+summary(stepFit) # results hidden
+summary(stepFit)$coeff # results hidden
+sum((abs(dfbetas(stepFit)))>1)
 ```
 
